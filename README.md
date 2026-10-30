@@ -55,6 +55,12 @@ dependencies; Windows binaries are cross-compiled with `mingw-w64`).
 | `AppCloser` – tray, monitoring, `--headless` background service | `CGO_ENABLED=0 go build .` |
 | `AppCloser-Settings` – settings window | `go build -tags gui .` |
 
+## Releases
+
+Releases are published automatically: when `VERSION` on `main` contains a
+version that has no release yet, the build creates release `v<VERSION>` with
+both ZIPs attached.
+
 ## License
 
 [MIT](LICENSE)
