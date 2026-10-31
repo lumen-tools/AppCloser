@@ -52,5 +52,5 @@ jobs:
             if [[ "$GITHUB_REF" == refs/tags/* ]]; then gh release upload "$tag" dist/*.zip --clobber; fi
             echo "Release $tag already exists."
           else
-            gh release create "$tag" dist/*.zip --target "$GITHUB_SHA" --title "AppCloser $tag" --generate-notes
+            gh release create "$tag" dist/*.zip --target "$GITHUB_SHA" --title "Version ${tag#v}" --generate-notes
           fi
