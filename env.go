@@ -17,8 +17,10 @@ var origHome, _ = os.UserHomeDir()
 // the program folder removes everything.
 func isolateEnv() {
 	data := filepath.Join(exeDir(), "AppCloser-Cache")
-	os.MkdirAll(filepath.Join(data, "cache"), 0o755)
 	for k, v := range isolatedVars(data) {
+		if filepath.IsAbs(v) {
+			os.MkdirAll(v, 0o755)
+		}
 		os.Setenv(k, v)
 	}
 }

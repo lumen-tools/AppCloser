@@ -57,7 +57,7 @@ func runSettings() {
 	u.win = u.app.NewWindow("AppCloser Settings")
 	u.win.SetIcon(iconActive)
 	u.win.SetCloseIntercept(u.closeWindow)
-	u.win.Resize(fyne.NewSize(720, 760))
+	u.fitWindow(0)
 	u.win.SetContent(u.build())
 	u.refreshRules()
 	u.refreshStatus()
@@ -71,8 +71,34 @@ func runSettings() {
 	}()
 
 	u.win.Show()
+	// The real display scale is known once the window exists; correct the
+	// size if it differs from the estimate.
+	go func() {
+		time.Sleep(150 * time.Millisecond)
+		fyne.Do(func() { u.fitWindow(u.win.Canvas().Scale()) })
+	}()
 	u.app.Run()
 	os.Exit(0)
+}
+
+// fitWindow sizes the window to its preferred size, but never larger than
+// the free screen area (the content scrolls instead), and centers it.
+func (u *ui) fitWindow(scale float32) {
+	size := fyne.NewSize(720, 760)
+	aw, ah, est := workArea()
+	if scale <= 0 {
+		scale = est
+	}
+	if aw > 0 && ah > 0 && scale > 0 {
+		// Leave room for the window frame and title bar.
+		size.Width = min(size.Width, aw/scale-32)
+		size.Height = min(size.Height, ah/scale-64)
+	}
+	if u.win.Canvas().Size() == size {
+		return
+	}
+	u.win.Resize(size)
+	u.win.CenterOnScreen()
 }
 
 // closeWindow ends the settings process; the tray keeps running.
