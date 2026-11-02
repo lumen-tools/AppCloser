@@ -89,7 +89,7 @@ func setAutostart(on bool) error {
 	return k.SetStringValue("AppCloser", `"`+exePath(trayExe)+`" --autostart`)
 }
 
-const autostartHint = "Starts automatically when you sign in to Windows. Best untick this before deleting the folder (a leftover entry would be harmless, though)."
+const autostartHint = "Starts when you sign in. Turn this off before deleting the folder."
 
 // --- Single instance + messages via named mutex / named events ---
 

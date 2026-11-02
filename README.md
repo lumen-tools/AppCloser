@@ -63,4 +63,5 @@ both ZIPs attached.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). The settings window uses the [Inter](https://rsms.me/inter/) typeface
+by Rasmus Andersson, licensed under the SIL Open Font License ([fonts/Inter-LICENSE.txt](fonts/Inter-LICENSE.txt)).

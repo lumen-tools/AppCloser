@@ -267,7 +267,7 @@ func setAutostart(on bool) error {
 	return systemctl("enable", "--now", serviceName)
 }
 
-const autostartHint = "Monitors from power-on – also in Gaming Mode (invisible). In Desktop Mode the tray icon appears as well. “Quit” stops everything until the next restart. If the folder is deleted, the system ignores the autostart entries."
+const autostartHint = "Also monitors in Gaming Mode. If the folder is deleted, the system ignores this automatically."
 
 // --- Single instance + messages via abstract unix sockets (leave no files) ---
 
