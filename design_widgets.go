@@ -145,16 +145,20 @@ func (s *shape) MinSize() fyne.Size { return s.minSize }
 func (s *shape) CreateRenderer() fyne.WidgetRenderer {
 	if s.circle {
 		c := canvas.NewCircle(color.Transparent)
-		return &shapeRenderer{s: s, obj: c, apply: func() { c.FillColor = theme.Color(s.fill); c.Refresh() }}
+		cr := &shapeRenderer{s: s, obj: c, apply: func() { c.FillColor = theme.Color(s.fill); c.Refresh() }}
+		cr.apply()
+		return cr
 	}
 	r := canvas.NewRectangle(color.Transparent)
-	return &shapeRenderer{s: s, obj: r, apply: func() {
+	sr := &shapeRenderer{s: s, obj: r, apply: func() {
 		r.FillColor = theme.Color(s.fill)
 		if s.radius != "" {
 			r.CornerRadius = theme.Size(s.radius)
 		}
 		r.Refresh()
 	}}
+	sr.apply()
+	return sr
 }
 
 type shapeRenderer struct {
@@ -166,7 +170,7 @@ type shapeRenderer struct {
 func (r *shapeRenderer) Layout(sz fyne.Size)          { r.obj.Resize(sz) }
 func (r *shapeRenderer) MinSize() fyne.Size           { return r.s.minSize }
 func (r *shapeRenderer) Refresh()                     { r.apply() }
-func (r *shapeRenderer) Objects() []fyne.CanvasObject { r.apply(); return []fyne.CanvasObject{r.obj} }
+func (r *shapeRenderer) Objects() []fyne.CanvasObject { return []fyne.CanvasObject{r.obj} }
 func (r *shapeRenderer) Destroy()                     {}
 
 // card groups rows on a rounded surface, like a grouped form on macOS.
@@ -298,6 +302,7 @@ func (t *toggle) MinSize() fyne.Size { return fyne.NewSize(38, 22) }
 func (t *toggle) CreateRenderer() fyne.WidgetRenderer {
 	r := &toggleRenderer{t: t, track: canvas.NewRectangle(color.Transparent), knob: canvas.NewCircle(color.White)}
 	r.knob.StrokeWidth = 0.5
+	r.Refresh()
 	return r
 }
 
@@ -339,7 +344,6 @@ func (r *toggleRenderer) Refresh() {
 }
 
 func (r *toggleRenderer) Objects() []fyne.CanvasObject {
-	r.Refresh()
 	return []fyne.CanvasObject{r.track, r.knob}
 }
 func (r *toggleRenderer) Destroy() {}
