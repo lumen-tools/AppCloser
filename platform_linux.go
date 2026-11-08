@@ -339,7 +339,7 @@ var (
 // notifications show AppCloser's own icon.
 func notifyIconPath() string {
 	iconOnce.Do(func() {
-		p := filepath.Join(exeDir(), "AppCloser-Cache", "appcloser.png")
+		p := filepath.Join(dataDir(), "AppCloser-Cache", "appcloser.png")
 		os.MkdirAll(filepath.Dir(p), 0o755)
 		if os.WriteFile(p, logo.PNG(128, logo.Blue), 0o644) == nil {
 			iconPath = p

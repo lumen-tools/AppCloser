@@ -16,7 +16,7 @@ var origHome, _ = os.UserHomeDir()
 // driver) would write to into a folder next to the executable, so deleting
 // the program folder removes everything.
 func isolateEnv() {
-	data := filepath.Join(exeDir(), "AppCloser-Cache")
+	data := filepath.Join(dataDir(), "AppCloser-Cache")
 	for k, v := range isolatedVars(data) {
 		if filepath.IsAbs(v) {
 			os.MkdirAll(v, 0o755)

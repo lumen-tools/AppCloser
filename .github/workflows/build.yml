@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   build:
+    name: Windows and Linux
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -37,12 +38,47 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: AppCloser
+          name: windows-linux
           path: dist/*.zip
 
-      # A new number in VERSION on main publishes a release with the ZIPs.
+  build-mac:
+    name: macOS
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Vet and test
+        run: |
+          go vet .
+          go vet -tags gui .
+          go test .
+
+      - name: Build
+        run: ./build-mac.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: dist/*.zip
+
+  # A new number in VERSION on main publishes a release with all ZIPs.
+  release:
+    needs: [build, build-mac]
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
       - name: Publish release
-        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

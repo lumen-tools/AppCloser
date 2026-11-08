@@ -5,6 +5,7 @@ package main
 import (
 	"os"
 	"os/exec"
+	"runtime"
 	"time"
 
 	"fyne.io/systray"
@@ -48,7 +49,10 @@ func trayReady() {
 	mPause := systray.AddMenuItemCheckbox("Pause monitoring", "", paused)
 	systray.AddSeparator()
 	mQuit := systray.AddMenuItem("Quit AppCloser", "")
-	systray.SetOnTapped(openSettingsWindow)
+	// On macOS a click on a menu bar item opens its menu, as usual there.
+	if runtime.GOOS != "darwin" {
+		systray.SetOnTapped(openSettingsWindow)
+	}
 
 	go func() {
 		for {

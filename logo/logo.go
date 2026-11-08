@@ -109,3 +109,27 @@ func ICO(p Palette, sizes ...int) []byte {
 	}
 	return b.Bytes()
 }
+
+// TemplatePNG draws only the power symbol in black on transparent, for the
+// macOS menu bar (the system tints template images for light and dark).
+// alpha < 255 dims it, e.g. while paused.
+func TemplatePNG(size int, alpha uint8) []byte {
+	// Draw the full logo larger and keep its middle, so the symbol fills the
+	// menu bar slot.
+	big := size * 138 / 100
+	img := Draw(big, Palette{color.NRGBA{0, 0, 0, 255}, color.NRGBA{0, 0, 0, 255}})
+	off := (big - size) / 2
+	out := image.NewNRGBA(image.Rect(0, 0, size, size))
+	for y := 0; y < size; y++ {
+		for x := 0; x < size; x++ {
+			// The symbol is painted white on the (here black) square: keep the
+			// symbol as the only opaque part.
+			i := img.PixOffset(x+off, y+off)
+			a := uint32(img.Pix[i+3]) * uint32(img.Pix[i]) / 255 * uint32(alpha) / 255
+			out.Pix[out.PixOffset(x, y)+3] = uint8(a)
+		}
+	}
+	var buf bytes.Buffer
+	png.Encode(&buf, out)
+	return buf.Bytes()
+}

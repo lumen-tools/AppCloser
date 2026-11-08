@@ -18,7 +18,7 @@ func setTrayIcon(paused bool) {
 	if paused {
 		name, p = "tray-paused.ico", logo.Gray
 	}
-	path := filepath.Join(exeDir(), "AppCloser-Cache", name)
+	path := filepath.Join(dataDir(), "AppCloser-Cache", name)
 	if _, err := os.Stat(path); err != nil {
 		os.MkdirAll(filepath.Dir(path), 0o755)
 		os.WriteFile(path, logo.ICO(p, 16, 20, 24, 32, 48), 0o644)

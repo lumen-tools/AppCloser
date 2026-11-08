@@ -53,11 +53,29 @@ func exeDir() string {
 	return filepath.Dir(exe)
 }
 
+// dataDir is where settings and caches live: the program folder. On macOS the
+// programs sit inside AppCloser.app, which must not be written to, so it is
+// the folder that contains the app.
+func dataDir() string {
+	d := exeDir()
+	if strings.HasSuffix(d, ".app/Contents/MacOS") {
+		d = filepath.Dir(filepath.Dir(filepath.Dir(d)))
+		// A downloaded app that was not moved yet runs from a read-only
+		// random location ("App Translocation").
+		if strings.Contains(d, "/AppTranslocation/") {
+			home, _ := os.UserHomeDir()
+			d = filepath.Join(home, "Library", "Application Support", "AppCloser")
+			os.MkdirAll(d, 0o755)
+		}
+	}
+	return d
+}
+
 func configPath() string {
-	p := filepath.Join(exeDir(), "AppCloser-Settings.json")
+	p := filepath.Join(dataDir(), "AppCloser-Settings.json")
 	// Migrate the settings file of earlier (German) versions.
 	if _, err := os.Stat(p); os.IsNotExist(err) {
-		os.Rename(filepath.Join(exeDir(), "AppCloser-Einstellungen.json"), p)
+		os.Rename(filepath.Join(dataDir(), "AppCloser-Einstellungen.json"), p)
 	}
 	return p
 }
