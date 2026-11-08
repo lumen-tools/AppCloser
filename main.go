@@ -12,8 +12,12 @@ import "os"
 //	AppCloser-Settings   settings window (built with -tags gui, ends when closed)
 func main() {
 	mode := ""
-	if len(os.Args) > 1 {
-		mode = os.Args[1]
+	for _, a := range os.Args[1:] {
+		if a == "--debug" {
+			debugOn = true
+		} else if mode == "" {
+			mode = a
+		}
 	}
 	leaveProgramFolder()
 	switch mode {

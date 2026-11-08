@@ -290,6 +290,8 @@ func runMonitor(notify func(title, body string), reload func(), enforce bool, id
 	var c Config
 	version, trigVersion := -1, -1
 	loops := 0
+	var lastStates []RuleState
+	debugf("monitor started: enforce=%v, settings file %s, %d process(es) visible", enforce, configPath(), len(listProcesses()))
 	for {
 		if idle != nil && idle() {
 			time.Sleep(time.Second)
@@ -332,6 +334,15 @@ func runMonitor(notify func(title, body string), reload func(), enforce bool, id
 						}
 					}
 				}
+				if debugOn && (i >= len(lastStates) || lastStates[i].Trigger != trigger) {
+					n := 0
+					for _, p := range procs {
+						if p.matches(r.Target) {
+							n++
+						}
+					}
+					debugf("rule %d (%s): trigger now %q, %d running process(es) match %q", i+1, progName(r.Target), trigger, n, r.Target.Match)
+				}
 				states[i].Trigger = trigger
 				if trigger == "" || !enforce {
 					continue
@@ -341,7 +352,9 @@ func runMonitor(notify func(title, body string), reload func(), enforce bool, id
 					if p.PID == self || !p.matches(r.Target) || anyMatch(p, r.Triggers) {
 						continue
 					}
-					if killProcess(p.PID) == nil {
+					err := killProcess(p.PID)
+					debugf("rule %d: closing %s (pid %d) because %s runs: error=%v", i+1, p.Name, p.PID, trigger, err)
+					if err == nil {
 						killed++
 					}
 				}
@@ -355,6 +368,7 @@ func runMonitor(notify func(title, body string), reload func(), enforce bool, id
 				}
 			}
 		}
+		lastStates = states
 		stateMu.Lock()
 		ruleStates = states
 		stateMu.Unlock()
