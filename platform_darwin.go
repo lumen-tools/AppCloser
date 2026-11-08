@@ -207,9 +207,19 @@ func agentFile() string {
 	return filepath.Join(origHome, "Library", "LaunchAgents", agentLabel+".plist")
 }
 
+// launchPath is the tray program inside the real AppCloser.app, also when
+// macOS runs a hidden copy of it (that copy is gone after a restart).
+func launchPath() string {
+	app := filepath.Dir(filepath.Dir(exeDir()))
+	if o := originalAppPath(app); o != "" {
+		app = o
+	}
+	return filepath.Join(app, "Contents", "MacOS", trayExe)
+}
+
 func autostartEnabled() bool {
 	b, err := os.ReadFile(agentFile())
-	return err == nil && strings.Contains(string(b), exePath(trayExe))
+	return err == nil && strings.Contains(string(b), launchPath())
 }
 
 func setAutostart(on bool) error {
@@ -234,7 +244,7 @@ func setAutostart(on bool) error {
 	<true/>
 </dict>
 </plist>
-`, agentLabel, xmlEscape(exePath(trayExe)))
+`, agentLabel, xmlEscape(launchPath()))
 	if err := os.MkdirAll(filepath.Dir(agentFile()), 0o755); err != nil {
 		return err
 	}

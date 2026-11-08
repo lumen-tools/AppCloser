@@ -59,9 +59,14 @@ func exeDir() string {
 func dataDir() string {
 	d := exeDir()
 	if strings.HasSuffix(d, ".app/Contents/MacOS") {
-		d = filepath.Dir(filepath.Dir(filepath.Dir(d)))
-		// A downloaded app that was not moved yet runs from a read-only
-		// random location ("App Translocation").
+		app := filepath.Dir(filepath.Dir(d))
+		// macOS runs downloaded apps from a hidden read-only copy ("App
+		// Translocation"); settings belong next to the real app.
+		if o := originalAppPath(app); o != "" {
+			app = o
+		}
+		d = filepath.Dir(app)
+		// Only if macOS cannot tell where the real app is.
 		if strings.Contains(d, "/AppTranslocation/") {
 			home, _ := os.UserHomeDir()
 			d = filepath.Join(home, "Library", "Application Support", "AppCloser")

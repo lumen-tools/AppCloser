@@ -291,7 +291,7 @@ func runMonitor(notify func(title, body string), reload func(), enforce bool, id
 	version, trigVersion := -1, -1
 	loops := 0
 	var lastStates []RuleState
-	debugf("monitor started: enforce=%v, settings file %s, %d process(es) visible", enforce, configPath(), len(listProcesses()))
+	debugf("monitor started: enforce=%v, program %s, settings file %s, %d process(es) visible", enforce, exeDir(), configPath(), len(listProcesses()))
 	for {
 		if idle != nil && idle() {
 			time.Sleep(time.Second)
